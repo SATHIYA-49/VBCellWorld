@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -6,8 +7,8 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests (necessary for Cordova apps)
 
-# MongoDB connection
-app.config["MONGO_URI"] = "mongodb+srv://leo:adminjc@cluster0.70xx2.mongodb.net/judicabs_db?retryWrites=true&w=majority"
+# MongoDB connection using environment variable for URI
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 client = MongoClient(app.config["MONGO_URI"])
 db = client['judicabs_db']
 bookings_collection = db['bookings']
@@ -36,5 +37,6 @@ def get_bookings():
     
     return jsonify(bookings)
 
+# Vercel uses this WSGI application interface
 if __name__ == '__main__':
     app.run(debug=True)
