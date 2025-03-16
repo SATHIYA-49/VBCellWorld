@@ -8,7 +8,7 @@
   ],
   "env": {
     "PORT": "5000",
-    "DATABASE_URL": "file:./database.sqlite",
+    "DATABASE_URL": "postgresql://vb_postgres_user:dIcD1pxGhTw3naPHB6xPi3xQr5VftYip@dpg-cvb9daaj1k6c73949oi0-a.oregon-postgres.render.com/vb_postgres",
     "FRONTEND_URL": "your_frontend_url"
   }
 }

@@ -1,12 +1,13 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config(); // Load environment variables
 
+// Initialize Sequelize with PostgreSQL
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     dialectOptions: {
         ssl: {
             require: true,
-            rejectUnauthorized: false, // Required for Render DB
+            rejectUnauthorized: false, // Required for some cloud DB providers
         },
     },
     logging: false, // Disable SQL logs
@@ -33,20 +34,24 @@ const User = sequelize.define('User', {
         allowNull: false
     }
 }, {
-    timestamps: false // Disable createdAt & updatedAt fields
+    timestamps: false, // Disable createdAt & updatedAt fields
 });
 
-// Sync the database
-(async () => {
+// Function to initialize the database
+const initDB = async () => {
     try {
         await sequelize.authenticate();
         console.log("✅ Database connected successfully");
 
-        await sequelize.sync(); // Sync models
+        await sequelize.sync({ alter: true }); // Keeps schema up-to-date
         console.log("✅ Database synced successfully");
     } catch (error) {
         console.error("❌ Database connection error:", error);
+        process.exit(1); // Exit the process if the database fails to connect
     }
-})();
+};
+
+// Initialize DB on app startup
+initDB();
 
 module.exports = { sequelize, User };
