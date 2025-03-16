@@ -1,3 +1,0 @@
-Flask==2.0.2
-Flask-Cors==2.1.2  # A compatible version
-pymongo==3.12.1
