@@ -1,9 +1,15 @@
 const { Sequelize, DataTypes } = require('sequelize');
+require('dotenv').config(); // Load environment variables
 
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './database.sqlite', // Path to your SQLite database
-    logging: false, // Disable logging for cleaner output
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false, // Required for Render DB
+        },
+    },
+    logging: false, // Disable SQL logs
 });
 
 // Define User Model
@@ -31,8 +37,16 @@ const User = sequelize.define('User', {
 });
 
 // Sync the database
-sequelize.sync()
-    .then(() => console.log("✅ Database connected and synced"))
-    .catch(err => console.error("❌ Database sync error:", err));
+(async () => {
+    try {
+        await sequelize.authenticate();
+        console.log("✅ Database connected successfully");
 
-module.exports = sequelize;
+        await sequelize.sync(); // Sync models
+        console.log("✅ Database synced successfully");
+    } catch (error) {
+        console.error("❌ Database connection error:", error);
+    }
+})();
+
+module.exports = { sequelize, User };
