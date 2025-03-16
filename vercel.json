@@ -1,9 +1,14 @@
 {
   "version": 2,
   "builds": [
-    { "src": "app.py", "use": "@vercel/python" }
+    { "src": "src/app.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/.*", "dest": "app.py" }
-  ]
+    { "src": "/(.*)", "dest": "/src/app.js" }
+  ],
+  "env": {
+    "PORT": "5000",
+    "DATABASE_URL": "file:./database.sqlite",
+    "FRONTEND_URL": "your_frontend_url"
+  }
 }
