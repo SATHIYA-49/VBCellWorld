@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/app.js",
-  "scripts": {
-    "start": "node src/app.js",
-    "build": "echo 'Skipping build step'",
-    "vercel-build": "npm install && node src/app.js"
-  },
+ "scripts": {
+  "start": "node src/app.js"
+}
+,
   "dependencies": {
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
