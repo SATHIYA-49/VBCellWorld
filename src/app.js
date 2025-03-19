@@ -21,10 +21,12 @@ const limiter = rateLimit({
 
 // ✅ Security Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*', // Restrict to frontend URL if available
+    origin: "*", // ✅ Allows requests from any frontend (including Electron apps)
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'], // ✅ Allows necessary headers
     credentials: true
 }));
+
 app.use(helmet());
 app.use(limiter); // Apply limiter AFTER defining it
 
@@ -35,11 +37,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
-// Sync Database & Start Server
-const PORT = process.env.PORT || 5000;
-sequelize.sync({ force: false }) // Don't force unless needed
+const PORT = process.env.PORT || 3000;
+
+sequelize.sync({ force: false })
     .then(() => {
         console.log("✅ Database synced!");
-        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+        app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));
     })
     .catch(err => console.error("❌ Database sync error:", err));

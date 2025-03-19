@@ -23,7 +23,9 @@ const register = async (req, res) => {
             role
         });
 
-        res.status(201).json({ message: "User registered successfully", user: newUser });
+        res.status(201)
+           .setHeader("Content-Type", "application/json") // ✅ Ensure JSON response
+           .json({ message: "User registered successfully", user: newUser });
     } catch (error) {
         console.error("❌ Registration Error:", error);
         res.status(500).json({ message: "Server error", error });
@@ -35,34 +37,36 @@ const loginUser = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
+        // Check if user exists
         const user = await User.findOne({ where: { username } });
         if (!user) {
-            return res.status(401).json({ message: "Invalid username or password" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
+        // Validate password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: "Invalid username or password" });
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Generate JWT token
+        if (!process.env.JWT_SECRET) {
+            console.error("❌ JWT_SECRET is missing in .env");
+            return res.status(500).json({ message: "Internal server error" });
         }
 
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role },
-            process.env.JWT_SECRET || "your_secret_key",
-            { expiresIn: "1h" }
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
         );
 
-        res.status(200).json({
-            message: "Login successful",
-            token,
-            user: { id: user.id, username: user.username, role: user.role }
-        });
-    } catch (error) {
-        console.error("❌ Login Error:", error);
-        res.status(500).json({ message: "Server error", error });
+        res.status(200)
+           .setHeader("Content-Type", "application/json") // ✅ Ensure JSON response
+           .json({ token, user });
+    } catch (err) {
+        console.error("❌ Login Error:", err);
+        res.status(500).json({ message: "Server error" });
     }
 };
 

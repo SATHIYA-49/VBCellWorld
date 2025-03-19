@@ -1,5 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/db'); // Ensure correct import
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db'); // ✅ Correct import
 
 const User = sequelize.define('User', {
     id: {
@@ -24,9 +24,14 @@ const User = sequelize.define('User', {
     timestamps: false
 });
 
-// Ensure the model is synced
-sequelize.sync()
-    .then(() => console.log("✅ User Model Synced!"))
-    .catch(err => console.error("❌ Model Sync Error:", err));
+// Sync User model
+(async () => {
+    try {
+        await sequelize.sync();
+        console.log("✅ User Model Synced!");
+    } catch (error) {
+        console.error("❌ Model Sync Error:", error);
+    }
+})();
 
 module.exports = User;
